@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مساحتي الآمنة - Safe Space</title>
+    <!-- Tailwind CSS for modern responsive styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Beautiful Google Fonts for Arabic & Latin script -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Tajawal', 'Inter', sans-serif;
+            background: linear-gradient(135deg, #fef6fb 0%, #f3f3ff 50%, #eefbfb 100%);
+            background-size: 400% 400%;
+            animation: gradientBG 20s ease infinite;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Cozy Card Transitions & Hover Effects */
+        .card-transition {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .card-transition:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 30px -10px rgba(167, 139, 250, 0.25);
+        }
+
+        /* Breathing Exercise Animation Bubble */
+        @keyframes breatheAnimation {
+            0%, 100% {
+                transform: scale(1);
+                background-color: rgba(167, 139, 250, 0.2);
+                box-shadow: 0 0 10px rgba(167, 139, 250, 0.3);
+            }
+            40% {
+                transform: scale(1.6);
+                background-color: rgba(129, 140, 248, 0.4);
+                box-shadow: 0 0 25px rgba(129, 140, 248, 0.6);
+            }
+            60% {
+                transform: scale(1.6);
+                background-color: rgba(129, 140, 248, 0.4);
+            }
+        }
+        .breathing-active {
+            animation: breatheAnimation 8s infinite ease-in-out;
+        }
+
+        /* Smoke/Dissolve Animation for Letter Burner */
+        @keyframes dissolveOut {
+            0% {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+                filter: blur(0px);
+            }
+            50% {
+                opacity: 0.5;
+                transform: scale(0.95) translateY(-10px);
+                filter: blur(3px);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(0.9) translateY(-30px);
+                filter: blur(8px);
+            }
+        }
+        .dissolving {
+            animation: dissolveOut 2.5s forwards ease-in-out;
+        }
+
+        /* Custom range slider styling */
+        input[type="range"]::-webkit-slider-thumb {
+            transition: transform 0.1s ease;
+        }
+        input[type="range"]::-webkit-slider-thumb:active {
+            transform: scale(1.3);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between text-gray-700 antialiased selection:bg-purple-100 selection:text-purple-900">
+
+    <script>
+        // Web Audio Context for producing warm and cozy synthetic sounds
+        let audioCtx = null;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        function playCalmChime(preset = 'gentle') {
+            try {
+                initAudio();
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+
+                const now = audioCtx.currentTime;
+                
+                if (preset === 'gentle') {
+                    // Soft high chime (major chord notes)
+                    playTone(523.25, now, 0.15, 0.4); // C5
+                    playTone(659.25, now + 0.1, 0.15, 0.4); // E5
+                    playTone(783.99, now + 0.2, 0.25, 0.5); // G5
+                } else if (preset === 'deep') {
+                    // Grounding hum
+                    playTone(220.00, now, 0.4, 0.4); // A3
+                    playTone(277.18, now + 0.15, 0.5, 0.3); // C#4
+                } else if (preset === 'complete') {
+                    // Uplifting complete melody
+                    playTone(587.33, now, 0.12, 0.3); // D5
+                    playTone(659.25, now + 0.08, 0.12, 0.3); // E5
+                    playTone(783.99, now + 0.16, 0.12, 0.3); // G5
+                    playTone(880.00, now + 0.24, 0.4, 0.5); // A5
+                } else if (preset === 'puff') {
+                    // Soft sweeping sound for dissolving
+                    let osc = audioCtx.createOscillator();
+                    let gain = audioCtx.createGain();
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(300, now);
+                    osc.frequency.exponentialRampToValueAtTime(80, now + 1.2);
+                    gain.gain.setValueAtTime(0.3, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 1.2);
+                    osc.start(now);
+                    osc.stop(now + 1.2);
+                }
+            } catch (e) {
+                console.log("Audio not supported or interaction deferred: " + e);
+            }
+        }
+
+        function playTone(freq, time, duration, vol) {
+            let osc = audioCtx.createOscillator();
+            let gainNode = audioCtx.createGain();
+            
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, time);
+            
+            gainNode.gain.setValueAtTime(0, time);
+            gainNode.gain.linearRampToValueAtTime(vol, time + 0.05);
+            gainNode.gain.exponentialRampToValueAtTime(0.0001, time + duration);
+            
+            osc.start(time);
+            osc.stop(time + duration);
+        }
+    </script>
+
+    <!-- Header Section -->
+    <header class="w-full max-w-7xl mx-auto px-6 pt-8 pb-4">
+        <div class="flex flex-col md:flex-row items-center justify-between gap-6 bg-white/70 backdrop-blur-md rounded-3xl p-6 shadow-sm border border-pink-100/50">
+            <div class="text-right">
+                <div class="flex items-center gap-2 mb-1 justify-center md:justify-start">
+                    <span class="text-3xl animate-bounce">✨</span>
+                    <h1 class="text-2xl md:text-3xl font-extrabold bg-gradient-to-r from-purple-600 via-pink-500 to-teal-500 bg-clip-text text-transparent">مساحتي الآمنة</h1>
+                </div>
+                <p class="text-xs md:text-sm text-gray-500 font-medium">ملاذكِ الشخصي الصغير للشعور بالسلام والترتيب والبركة 🕊️</p>
+            </div>
+            
+            <!-- Personalized User Input -->
+            <div class="flex flex-col sm:flex-row items-center gap-3 bg-white p-2 rounded-2xl border border-purple-100/80 shadow-inner w-full sm:w-auto">
+                <span class="text-xs font-bold text-purple-600 px-3 whitespace-nowrap">ما هو اسمكِ اللطيف اليوم؟</span>
+                <input type="text" id="userNameInput" oninput="personalizeApp()" placeholder="مثال: سارة..." class="w-full sm:w-44 px-3 py-1.5 text-xs text-center border-none focus:outline-none focus:ring-2 focus:ring-purple-200 bg-purple-50/50 rounded-xl font-bold text-purple-800">
+            </div>
+        </div>
+    </header>
+
+    <!-- Custom Beautiful Horizontal Divider (---) -->
+    <div class="w-full max-w-7xl mx-auto px-6">
+        <div class="relative flex py-2 items-center">
+            <div class="flex-grow border-t-2 border-dashed border-purple-100"></div>
+            <span class="flex-shrink mx-4 text-purple-300 text-sm tracking-widest">✦ 🌟 ✦</span>
+            <div class="flex-grow border-t-2 border-dashed border-purple-100"></div>
+        </div>
+    </div>
+
+    <!-- Main Grid: 4 Interactive Cards -->
+    <main class="max-w-7xl mx-auto w-full px-6 py-4 flex-grow">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+
+            <!-- ==================== CARD 1: EXAM ANXIETY ==================== -->
+            <article class="bg-white/95 rounded-3xl p-6 shadow-lg border border-purple-100 flex flex-col justify-between card-transition relative overflow-hidden">
+                <!-- Background visual touch -->
+                <div class="absolute -right-8 -top-8 w-24 h-24 bg-purple-100 rounded-full opacity-40"></div>
+                
+                <div class="relative z-10">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="text-3xl bg-purple-100 p-2 rounded-2xl shadow-inner">📝</span>
+                        <div>
+                            <span class="text-[10px] font-bold text-purple-500 tracking-wider">الجانب الدراسي</span>
+                            <h3 class="text-lg font-bold text-gray-800">قلق الامتحانات</h3>
+                        </div>
+                    </div>
+                    
+                    <p class="text-xs text-gray-500 mb-4 leading-relaxed">
+                        هل تشعرين بعبء الاختبارات والتشتت؟ تنفّسي بعمق، فالنجاح لا يأتي بالتوتر بل بالسعي الهادئ المتوكّل.
+                    </p>
+
+                    <hr class="border-dashed border-gray-100 my-4">
+
+                    <!-- 1. Interactive Mood Meter -->
+                    <div class="mb-4 bg-purple-50/60 p-3 rounded-2xl border border-purple-100">
+                        <label class="block text-[10px] font-bold text-purple-700 mb-1">📊 مقياس القلق:</label>
+                        <input type="range" id="anxietyRange" min="1" max="5" value="3" oninput="updateAnxietyMeter(this.value)" class="w-full accent-purple-600 h-1.5 bg-purple-200 rounded-lg cursor-pointer">
+                        <div id="anxietyStatus" class="mt-2 p-2 bg-white/90 rounded-xl text-[10px] text-center border border-purple-100 font-semibold text-purple-800">
+                            حالتكِ: تحتاجين لجرعة طمأنينة! 🍵
+                        </div>
+                    </div>
+
+                    <!-- 2. Faith Compass -->
+                    <div class="mb-4 bg-amber-50/60 p-3 rounded-2xl border border-amber-100">
+                        <h4 class="text-[10px] font-bold text-amber-800 mb-1">🧭 بوصلة إيمانية:</h4>
+                        <blockquote class="text-[11px] italic text-gray-700 font-semibold bg-white/70 p-2 rounded-lg border border-amber-100/50">
+                            "أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ"
+                        </blockquote>
+                    </div>
+                </div>
+
+                <!-- 3. Activation Button -->
+                <div class="relative z-10 mt-auto">
+                    <button onclick="toggleAction('anxietyAction')" class="w-full py-2 bg-gradient-to-r from-purple-500 to-indigo-600 text-white rounded-xl font-bold text-xs shadow-md transition-all hover:scale-[1.02]">
+                        🧘‍♂️ تمرين التنفس
+                    </button>
+                    
+                    <div id="anxietyAction" class="hidden mt-3 p-3 bg-slate-50 rounded-xl border border-slate-200">
+                        <div class="flex flex-col items-center">
+                            <!-- Visual Animated Breath Bubble -->
+                            <div id="breathBubble" class="w-16 h-16 rounded-full bg-purple-100 flex items-center justify-center text-[10px] font-bold text-purple-800 transition-all duration-1000">
+                                جاهزة؟
+                            </div>
+                            <span id="breathText" class="text-[10px] font-bold text-purple-600 mt-2">انقري للبدء 🌬️</span>
+                            <button onclick="startBreathingExercise()" id="breathControlBtn" class="mt-2 text-[9px] px-2 py-0.5 bg-purple-600 text-white rounded-full">ابدئي التدفق</button>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <!-- ==================== CARD 2: FRIENDSHIP CONFLICT ==================== -->
+            <article class="bg-white/95 rounded-3xl p-6 shadow-lg border border-rose-100 flex flex-col justify-between card-transition relative overflow-hidden">
+                <!-- Background visual touch -->
+                <div class="absolute -right-8 -top-8 w-24 h-24 bg-rose-100 rounded-full opacity-40"></div>
+
+                <div class="relative z-10">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="text-3xl bg-rose-100 p-2 rounded-2xl shadow-inner">💔</span>
+                        <div>
+                            <span class="text-[10px] font-bold text-rose-500 tracking-wider">الجانب الاجتماعي</span>
+                            <h3 class="text-lg font-bold text-gray-800">الزعل مع صديقة</h3>
+                        </div>
+                    </div>
+                    
+                    <p class="text-xs text-gray-500 mb-4 leading-relaxed">
+                        هل تشعرين بضيق بسبب سوء تفاهم؟ العلاقات صعود وهبوط، والقلب يستحق أن يتحرر من العتب والزعل.
+                    </p>
+
+                    <hr class="border-dashed border-gray-100 my-4">
+
+                    <!-- 1. Interactive Mood Meter -->
+                    <div class="mb-4 bg-rose-50/60 p-3 rounded-2xl border border-rose-100">
+                        <label class="block text-[10px] font-bold text-rose-700 mb-1">📊 مقياس الضيق:</label>
+                        <input type="range" id="sadnessRange" min="1" max="5" value="3" oninput="updateSadnessMeter(this.value)" class="w-full accent-rose-500 h-1.5 bg-rose-200 rounded-lg cursor-pointer">
+                        <div id="sadnessStatus" class="mt-2 p-2 bg-white/90 rounded-xl text-[10px] text-center border border-rose-100 font-semibold text-rose-800">
+                            قلبكِ يستحق اللطف والمسامحة! 💕
+                        </div>
+                    </div>
+
+                    <!-- 2. Faith Compass -->
+                    <div class="mb-4 bg-emerald-50/60 p-3 rounded-2xl border border-emerald-100">
+                        <h4 class="text-[10px] font-bold text-emerald-800 mb-1">🧭 بوصلة الصلح:</h4>
+                        <blockquote class="text-[11px] italic text-gray-700 font-semibold bg-white/70 p-2 rounded-lg border border-emerald-100/50">
+                            "ادْفَعْ بِالَّتِي هِيَ أَحْسَنُ"
+                        </blockquote>
+                    </div>
+                </div>
+
+                <!-- 3. Activation Button -->
+                <div class="relative z-10 mt-auto">
+                    <button onclick="toggleAction('friendshipAction')" class="w-full py-2 bg-gradient-to-r from-rose-500 to-pink-600 text-white rounded-xl font-bold text-xs shadow-md transition-all hover:scale-[1.02]">
+                        ✉️ تفريغ المشاعر
+                    </button>
+                    
+                    <div id="friendshipAction" class="hidden mt-3 p-3 bg-slate-50 rounded-xl border border-slate-200">
+                        <textarea id="friendshipLetter" rows="2" placeholder="اكتبي مشاعرك، عتبك، أو الكلمات التي تضايقك هنا لتبخيرها..." class="w-full p-2 text-[11px] rounded-lg border border-gray-200 mb-2 focus:ring-1 focus:ring-rose-200 focus:outline-none transition-all"></textarea>
+                        <button id="burnLetterBtn" onclick="dissolveLetter()" class="w-full py-1 bg-rose-100 text-rose-700 rounded-lg text-[10px] font-bold hover:bg-rose-200 transition-colors">تبخير المشاعر 💨</button>
+                    </div>
+                </div>
+            </article>
+
+            <!-- ==================== CARD 3: TIME MANAGEMENT ==================== -->
+            <article class="bg-white/95 rounded-3xl p-6 shadow-lg border border-sky-100 flex flex-col justify-between card-transition relative overflow-hidden">
+                <!-- Background visual touch -->
+                <div class="absolute -right-8 -top-8 w-24 h-24 bg-sky-100 rounded-full opacity-40"></div>
+
+                <div class="relative z-10">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="text-3xl bg-sky-100 p-2 rounded-2xl shadow-inner">⏳</span>
+                        <div>
+                            <span class="text-[10px] font-bold text-sky-500 tracking-wider">الجانب اليومي</span>
+                            <h3 class="text-lg font-bold text-gray-800">فوضى المهام</h3>
+                        </div>
+                    </div>
+                    
+                    <p class="text-xs text-gray-500 mb-4 leading-relaxed">
+                        المهام المتراكمة تسبب التشتت؟ حبة حبة، خطوة صغيرة جداً هي كسر لدورة التسويف اللانهائية.
+                    </p>
+
+                    <hr class="border-dashed border-gray-200 my-4">
+
+                    <!-- 1. Interactive Mood Meter -->
+                    <div class="mb-4 bg-sky-50/60 p-3 rounded-2xl border border-sky-100">
+                        <label class="block text-[10px] font-bold text-sky-700 mb-1">📊 مقياس التشتت:</label>
+                        <input type="range" id="timeRange" min="1" max="5" value="3" oninput="updateTimeMeter(this.value)" class="w-full accent-sky-500 h-1.5 bg-sky-200 rounded-lg cursor-pointer">
+                        <div id="timeStatus" class="mt-2 p-2 bg-white/90 rounded-xl text-[10px] text-center border border-sky-100 font-semibold text-sky-800">
+                            تنفسي ورتبي أفكاركِ بهدوء! 🛠️
+                        </div>
+                    </div>
+
+                    <!-- 2. Faith Compass -->
+                    <div class="mb-4 bg-violet-50/60 p-3 rounded-2xl border border-violet-100">
+                        <h4 class="text-[10px] font-bold text-violet-800 mb-1">🧭 بوصلة البركة:</h4>
+                        <blockquote class="text-[11px] italic text-gray-700 font-semibold bg-white/70 p-2 rounded-lg border border-violet-100/50">
+                            "بُورِك لأُمّتي في بُكورها"
+                        </blockquote>
+                    </div>
+                </div>
+
+                <!-- 3. Activation Button -->
+                <div class="relative z-10 mt-auto">
+                    <button onclick="toggleAction('timeAction')" class="w-full py-2 bg-gradient-to-r from-sky-500 to-blue-600 text-white rounded-xl font-bold text-xs shadow-md transition-all hover:scale-[1.02]">
+                        ⏱️ عداد التركيز (بومودورو)
+                    </button>
+                    
+                    <div id="timeAction" class="hidden mt-3 p-3 bg-slate-50 rounded-xl border border-slate-200 text-center">
+                        <div id="timerDisplay" class="text-xl font-bold text-sky-600 font-mono">05:00</div>
+                        <div class="flex justify-center gap-2 mt-2">
+                            <button id="timerStartBtn" onclick="toggleTimer()" class="px-3 py-1 bg-sky-500 text-white text-[9px] font-bold rounded-lg hover:bg-sky-600 transition-colors">ابدئي</button>
+                            <button onclick="resetTimer()" class="px-3 py-1 bg-gray-200 text-gray-700 text-[9px] font-bold rounded-lg hover:bg-gray-300 transition-colors">إعادة</button>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <!-- ==================== CARD 4: FAMILY & FAITH (NEW) ==================== -->
+            <article class="bg-white/95 rounded-3xl p-6 shadow-lg border border-teal-100 flex flex-col justify-between card-transition relative overflow-hidden">
+                <!-- Background visual touch -->
+                <div class="absolute -right-8 -top-8 w-24 h-24 bg-teal-100 rounded-full opacity-40"></div>
+                
+                <div class="relative z-10">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="text-3xl bg-teal-100 p-2 rounded-2xl shadow-inner">🏠</span>
+                        <div>
+                            <span class="text-[10px] font-bold text-teal-500 tracking-wider">الجانب الأسري والروحاني</span>
+                            <h3 class="text-lg font-bold text-gray-800">السكينة والروابط</h3>
+                        </div>
+                    </div>
+                    
+                    <p class="text-xs text-gray-500 mb-4 leading-relaxed">
+                        البيت هو الملاذ الأول الحقيقي. أي كلمة طيبة أو مبادرة مودة عائلية كفيلة بنشر السكينة والأمان في أركانه.
+                    </p>
+
+                    <hr class="border-dashed border-gray-200 my-4">
+
+                    <!-- 1. Interactive Mood Meter -->
+                    <div class="mb-4 bg-teal-50/60 p-3 rounded-2xl border border-teal-100">
+                        <label class="block text-[10px] font-bold text-teal-700 mb-1">📊 مقياس المودة بالمنزل:</label>
+                        <input type="range" id="familyRange" min="1" max="5" value="3" oninput="updateFamilyMeter(this.value)" class="w-full accent-teal-500 h-1.5 bg-teal-200 rounded-lg cursor-pointer">
+                        <div id="familyStatus" class="mt-2 p-2 bg-white/90 rounded-xl text-[10px] text-center border border-teal-100 font-semibold text-teal-800">
+                            البيت يحتاج لابتسامتكِ ودعائكِ! 🏠💕
+                        </div>
+                    </div>
+
+                    <!-- 2. Faith Compass -->
+                    <div class="mb-4 bg-orange-50/60 p-3 rounded-2xl border border-orange-100">
+                        <h4 class="text-[10px] font-bold text-orange-800 mb-1">🧭 بوصلة البر والسكينة:</h4>
+                        <blockquote class="text-[11px] italic text-gray-700 font-semibold bg-white/70 p-2 rounded-lg border border-orange-100/50">
+                            "وَبِالْوَالِدَيْنِ إِحْسَانًا"
+                        </blockquote>
+                    </div>
+                </div>
+
+                <!-- 3. Activation Button -->
+                <div class="relative z-10 mt-auto">
+                    <button onclick="toggleAction('familyAction')" class="w-full py-2 bg-gradient-to-r from-teal-500 to-emerald-600 text-white rounded-xl font-bold text-xs shadow-md transition-all hover:scale-[1.02]">
+                        🤲 مولّد مبادرات البر
+                    </button>
+                    
+                    <div id="familyAction" class="hidden mt-3 p-3 bg-teal-50/50 rounded-xl border border-teal-100 text-center">
+                        <p class="text-[10px] text-gray-600 mb-3" id="familyChallengeText">انقري للحصول على مبادرة عائلية دافئة ومميزة 🌸</p>
+                        <div class="flex justify-center gap-2">
+                            <button onclick="generateFamilyChallenge()" class="text-[9px] bg-white px-3 py-1 rounded-full border border-teal-200 shadow-sm font-bold text-teal-700">توليد مبادرة 💫</button>
+                            <button onclick="completeFamilyChallenge()" id="completeChallengeBtn" class="hidden text-[9px] bg-teal-600 px-3 py-1 rounded-full text-white font-bold shadow-sm">تم التنفيذ! ✅</button>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+        </div>
+    </main>
+
+    <!-- Beautiful Horizontal Divider (---) -->
+    <div class="w-full max-w-7xl mx-auto px-6 py-2">
+        <div class="relative flex py-2 items-center">
+            <div class="flex-grow border-t-2 border-dashed border-pink-100"></div>
+            <span class="flex-shrink mx-4 text-pink-300 text-sm tracking-widest">✦ 📖 ✦</span>
+            <div class="flex-grow border-t-2 border-dashed border-pink-100"></div>
+        </div>
+    </div>
+
+    <!-- Extra: Interactive Mood Notes/Diary to increase value -->
+    <section class="w-full max-w-4xl mx-auto px-6 mb-8">
+        <div class="bg-white/80 backdrop-blur-md rounded-3xl p-6 border border-pink-100 shadow-lg text-right">
+            <h3 class="text-md font-bold text-purple-800 mb-2 flex items-center gap-2 justify-start">
+                <span>💭</span> دفتر خلواتكِ ومذكراتكِ اليومية (سري ومحفوظ بالكامل على جهازكِ)
+            </h3>
+            <p class="text-[11px] text-gray-400 mb-4">اكتبي ما يعتمل في ذهنك اليوم، وسيحفظ تلقائياً في متصفحك الخاص.</p>
+            <textarea id="moodDiary" rows="3" oninput="saveDiaryText()" placeholder="اكتبي هنا أسراركِ وأمنياتكِ..." class="w-full p-3 text-xs rounded-2xl border border-purple-50 focus:outline-none focus:ring-2 focus:ring-pink-200 bg-white/90"></textarea>
+            <div class="flex justify-between items-center mt-3">
+                <span id="saveBadge" class="text-[10px] text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full font-bold opacity-0 transition-opacity duration-300">تم الحفظ تلقائياً ✓</span>
+                <button onclick="clearDiary()" class="text-[10px] text-rose-500 hover:text-rose-700 font-bold">مسح المفكرة 🗑️</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Custom Beautiful Toast Feedback for Interactive Actions -->
+    <div id="toast" class="fixed bottom-4 left-4 z-50 bg-slate-900 text-white text-xs font-semibold py-2.5 px-4 rounded-xl shadow-2xl opacity-0 translate-y-2 pointer-events-none transition-all duration-300 flex items-center gap-2">
+        <span id="toastIcon">✨</span>
+        <span id="toastText">تمت العملية بنجاح!</span>
+    </div>
+
+    <!-- Footer -->
+    <footer class="w-full text-center py-6 text-[11px] text-purple-400 font-medium">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="relative flex py-2 items-center">
+                <div class="flex-grow border-t border-purple-100/30"></div>
+                <span class="flex-shrink mx-4 text-purple-300/60">صُنع بحب ليكون مساحتكِ الآمنة 🤍</span>
+                <div class="flex-grow border-t border-purple-100/30"></div>
+            </div>
+            <p class="mt-2">جميع الحقوق محفوظة © <span id="footerYear">2026</span> - مساحتي الآمنة</p>
+        </div>
+    </footer>
+
+    <!-- Application Logic -->
+    <script>
+        // Set dynamic year in footer
+        document.getElementById('footerYear').textContent = new Date().getFullYear();
+
+        // Personalized dynamic greetings configuration
+        function personalizeApp() {
+            const userName = document.getElementById('userNameInput').value.trim() || "صديقتي اللطيفة";
+            
+            // Re-trigger update of all meters to use the new name immediately
+            updateAnxietyMeter(document.getElementById('anxietyRange').value);
+            updateSadnessMeter(document.getElementById('sadnessRange').value);
+            updateTimeMeter(document.getElementById('timeRange').value);
+            updateFamilyMeter(document.getElementById('familyRange').value);
+            
+            // Save username
+            localStorage.setItem('safeSpaceName', userName);
+        }
+
+        // --- EXAM ANXIETY METER LOGIC ---
+        function updateAnxietyMeter(val) {
+            const name = document.getElementById('userNameInput').value.trim() || "يا جميلة";
+            const status = document.getElementById('anxietyStatus');
+            const messages = {
+                1: `شعورك بالسلام عالي! كوني مستعدة بتفاؤل يا ${name}. ✨`,
+                2: `توتر طفيف جداً، هذا صحّي تماماً ويدل على اهتمامكِ! 🎓`,
+                3: `قلق متوسط يا ${name}. تحتاجين لجرعة طمأنينة وكوب شاي! 🍵`,
+                4: `قلق مرتفع! خذي استراحة فوراً واقرئي الورد. 🤲`,
+                5: `توقفّي عن الدراسة فوراً يا ${name}! تنفّسي معنا فجهدكِ لن يضيع. 🕊️`
+            };
+            status.textContent = messages[val] || '';
+        }
+
+        // --- FRIENDSHIP CONFLICT METER LOGIC ---
+        function updateSadnessMeter(val) {
+            const name = document.getElementById('userNameInput').value.trim() || "يا جميلة";
+            const status = document.getElementById('sadnessStatus');
+            const messages = {
+                1: `قلبكِ مرتاح وصافٍ. ربي يديم الود والمحبة في حياتكِ! 💕`,
+                2: `أثر سوء التفاهم طفيف. اتصال لطيف ينهي كل شيء! 📱`,
+                3: `هناك ضيق بسيط. عبري عن عتبكِ بلطف وصبر يا ${name}. ✨`,
+                4: `قلبكِ حزين ومنزعج.. تذكري أن القلوب تتقلب وتسامحي. 🕊️`,
+                5: `وخزة عميقة في الصدر يا ${name}! خذي وقتاً لتفريغ مشاعرك بالصندوق. ❤️‍🩹`
+            };
+            status.textContent = messages[val] || '';
+        }
+
+        // --- TIME MANAGEMENT METER LOGIC ---
+        function updateTimeMeter(val) {
+            const name = document.getElementById('userNameInput').value.trim() || "يا جميلة";
+            const status = document.getElementById('timeStatus');
+            const messages = {
+                1: `كل الأمور تحت السيطرة! يومكِ مبارك ومنظم يا ${name}. 🗓️`,
+                2: `هناك بعض المهام الإضافية، لكن قدرتكِ ممتازة. 💪`,
+                3: `فوضى خفيفة وتشتت وتأجيل. رتبي 3 أولويات فقط! 🛠️`,
+                4: `تراكم وتشتت مرتفع. خذي ورقة وقلم وافرغي مهامكِ الآن. 📝`,
+                5: `دائرة التسويف اللانهائية يا ${name}! لا تبدئي بكل شيء، بل بمهمة واحدة لخمس دقائق فقط. ⏱️`
+            };
+            status.textContent = messages[val] || '';
+        }
+
+        // --- FAMILY AND FAITH METER LOGIC ---
+        function updateFamilyMeter(val) {
+            const name = document.getElementById('userNameInput').value.trim() || "صديقتي";
+            const statusBox = document.getElementById('familyStatus');
+            const messages = {
+                1: `يا ${name}، بيتكِ ينعم بالمودة والرحمة. استمري بنشر هذا الدفء! 🏠💖`,
+                2: `علاقات عائلية طيبة، لا يمنع من تجديد الوصل بكلمة رقيقة اليوم. 😊`,
+                3: `فتور خفيف يا ${name}.. كوني أنتِ المبادرة بابتسامة وهدية بسيطة. 🌸`,
+                4: `هناك جفاء أو سوء تفاهم حالي؟ ابدئي بالكلمة الطيبة ولو كان الرد بسيطاً. 🕊️`,
+                5: `أجواء متوترة في البيت يا ${name}! احتسبي الأجر في الصبر والكلمة اللينة، فبيتكِ هو ملاذكِ. 🤲`
+            };
+            statusBox.textContent = messages[val] || '';
+        }
+
+        // --- TOGGLE INTERACTIVE ACTIONS ---
+        function toggleAction(id) {
+            const actions = ['anxietyAction', 'friendshipAction', 'timeAction', 'familyAction'];
+            actions.forEach(actId => {
+                const el = document.getElementById(actId);
+                if (actId === id) {
+                    const isHidden = el.classList.contains('hidden');
+                    if (isHidden) {
+                        el.classList.remove('hidden');
+                        playCalmChime('gentle');
+                    } else {
+                        el.classList.add('hidden');
+                    }
+                } else {
+                    el.classList.add('hidden');
+                }
+            });
+        }
+
+        // --- INTERACTIVE ACTION 1: BREATHING EXERCISE ---
+        let breathingTimer = null;
+        let breathingState = 0; // 0: Stopped, 1: Inhale, 2: Hold, 3: Exhale
+        let breathingInterval = null;
+
+        function startBreathingExercise() {
+            const bubble = document.getElementById('breathBubble');
+            const text = document.getElementById('breathText');
+            const btn = document.getElementById('breathControlBtn');
+
+            if (breathingInterval) {
+                // Stop exercise
+                clearInterval(breathingInterval);
+                breathingInterval = null;
+                bubble.classList.remove('breathing-active');
+                bubble.style.transform = "scale(1)";
+                bubble.textContent = "جاهزة؟";
+                text.textContent = "انقري للبدء 🌬️";
+                btn.textContent = "ابدئي التدفق";
+                return;
+            }
+
+            // Start Exercise
+            playCalmChime('deep');
+            btn.textContent = "توقف";
+            bubble.classList.add('breathing-active');
+            
+            let count = 0;
+            const cycle = () => {
+                // cycle length: 8 seconds (4s inhale, 4s exhale)
+                if (count % 2 === 0) {
+                    bubble.textContent = "شهيق...";
+                    text.textContent = "تنفسي ببطء، املئي رئتيكِ بالهواء والسكينة... 🌸";
+                    playCalmChime('deep');
+                } else {
+                    bubble.textContent = "زفير...";
+                    text.textContent = "أخرجي التوتر، والهم، والتعب بهدوء كامل... 🍃";
+                    playCalmChime('gentle');
+                }
+                count++;
+            };
+
+            cycle();
+            breathingInterval = setInterval(cycle, 4000);
+        }
+
+        // --- INTERACTIVE ACTION 2: LETTER DISSOLVER ---
+        function dissolveLetter() {
+            const letter = document.getElementById('friendshipLetter');
+            if (!letter.value.trim()) {
+                showToast("⚠️", "يرجى كتابة بعض الكلمات لتفريغها أولاً!");
+                return;
+            }
+
+            playCalmChime('puff');
+            letter.classList.add('dissolving');
+            
+            setTimeout(() => {
+                letter.value = "";
+                letter.classList.remove('dissolving');
+                showToast("💨", "تبخرت الغيمة من صدركِ! قلبكِ الآن أصفى وأجمل.");
+            }, 2500);
+        }
+
+        // --- INTERACTIVE ACTION 3: POMODORO TIMER ---
+        let timerSeconds = 300; // 5 minutes default
+        let timerInterval = null;
+
+        function updateTimerDisplay() {
+            const mins = Math.floor(timerSeconds / 60);
+            const secs = timerSeconds % 60;
+            document.getElementById('timerDisplay').textContent = 
+                `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        function toggleTimer() {
+            const btn = document.getElementById('timerStartBtn');
+            if (timerInterval) {
+                // Pause Timer
+                clearInterval(timerInterval);
+                timerInterval = null;
+                btn.textContent = "ابدئي";
+                btn.className = "px-3 py-1 bg-sky-500 text-white text-[9px] font-bold rounded-lg hover:bg-sky-600 transition-colors";
+            } else {
+                // Start Timer
+                btn.textContent = "إيقاف مؤقت";
+                btn.className = "px-3 py-1 bg-amber-500 text-white text-[9px] font-bold rounded-lg hover:bg-amber-600 transition-colors";
+                playCalmChime('gentle');
+                timerInterval = setInterval(() => {
+                    if (timerSeconds > 0) {
+                        timerSeconds--;
+                        updateTimerDisplay();
+                    } else {
+                        // Complete
+                        clearInterval(timerInterval);
+                        timerInterval = null;
+                        btn.textContent = "ابدئي";
+                        btn.className = "px-3 py-1 bg-sky-500 text-white text-[9px] font-bold rounded-lg hover:bg-sky-600 transition-colors";
+                        playCalmChime('complete');
+                        showToast("🎉", "انتهت فترة التركيز بنجاح! أحسنتِ صنعاً.");
+                    }
+                }, 1000);
+            }
+        }
+
+        function resetTimer() {
+            clearInterval(timerInterval);
+            timerInterval = null;
+            timerSeconds = 300;
+            updateTimerDisplay();
+            const btn = document.getElementById('timerStartBtn');
+            btn.textContent = "ابدئي";
+            btn.className = "px-3 py-1 bg-sky-500 text-white text-[9px] font-bold rounded-lg hover:bg-sky-600 transition-colors";
+        }
+
+        // --- INTERACTIVE ACTION 4: FAMILY CHALLENGE GENERATOR ---
+        const familyChallenges = [
+            "أرسلي رسالة نصية قصيرة لوالدتكِ تقولين فيها: 'أحبكِ يا جنتي ودعائي لكِ لا ينقطع'. 💖",
+            "اصنعي كوباً من الشاي أو القهوة الدافئة لوالدكِ أو أحد إخوتكِ وقدميه بابتسامة حانية. ☕",
+            "ادخلي على أحد أفراد عائلتكِ وقبلي جبينه/جبينها وعبري عن شكركِ لوجوده في حياتكِ. 🕊️",
+            "تطوعي بالقيام بمهمة منزلية بسيطة لتخفيف العبء عن والدتكِ دون أن تطلب منكِ. 🧼",
+            "ادعي بظهر الغيب لوالديكِ وإخوتكِ بدعاء دافئ من قلبكِ الآن. 🤲",
+            "امسحي على كتف أختكِ أو أخيكِ وشاركيهم ابتسامة مشجعة لمهامهم اليومية. 😊"
+        ];
+
+        function generateFamilyChallenge() {
+            playCalmChime('gentle');
+            const randomChallenge = familyChallenges[Math.floor(Math.random() * familyChallenges.length)];
+            const textElement = document.getElementById('familyChallengeText');
+            textElement.style.opacity = 0;
+            
+            setTimeout(() => {
+                textElement.textContent = randomChallenge;
+                textElement.style.opacity = 1;
+                textElement.className = "text-[10px] text-teal-800 font-semibold mb-3 transition-opacity duration-300";
+                document.getElementById('completeChallengeBtn').classList.remove('hidden');
+            }, 200);
+        }
+
+        function completeFamilyChallenge() {
+            playCalmChime('complete');
+            showToast("❤️", "لقد صنعتِ فرقاً دافئاً في بيتكِ اليوم!");
+            document.getElementById('completeChallengeBtn').classList.add('hidden');
+            document.getElementById('familyChallengeText').textContent = "رائع جداً! بارك الله في بركِ وسعيكِ الحاني بالمنزل. 🌸";
+            document.getElementById('familyChallengeText').className = "text-[10px] text-emerald-600 font-bold mb-3";
+        }
+
+        // --- STREAMING_CHUNK: Finalizing responsive behavior and page initialization ---
+        // --- MOOD DIARY LOCALSTORAGE LOGIC ---
+        function saveDiaryText() {
+            const text = document.getElementById('moodDiary').value;
+            localStorage.setItem('safeSpaceDiary', text);
+            const badge = document.getElementById('saveBadge');
+            badge.classList.remove('opacity-0');
+            badge.classList.add('opacity-100');
+            
+            // Auto-hide badge after a moment of no typing
+            clearTimeout(window.saveBadgeTimeout);
+            window.saveBadgeTimeout = setTimeout(() => {
+                badge.classList.remove('opacity-100');
+                badge.classList.add('opacity-0');
+            }, 1500);
+        }
+
+        function clearDiary() {
+            if (confirm("هل أنتِ متأكدة من رغبتكِ في مسح مفكرتكِ بالكامل؟")) {
+                document.getElementById('moodDiary').value = "";
+                localStorage.removeItem('safeSpaceDiary');
+                showToast("🗑️", "تم مسح المفكرة بالكامل.");
+            }
+        }
+
+        // --- CUSTOM TOAST SYSTEM (Alert avoidance) ---
+        function showToast(icon, text) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastIcon').textContent = icon;
+            document.getElementById('toastText').textContent = text;
+            
+            toast.classList.remove('opacity-0', 'translate-y-2', 'pointer-events-none');
+            toast.classList.add('opacity-100', 'translate-y-0');
+            
+            setTimeout(() => {
+                toast.classList.remove('opacity-100', 'translate-y-0');
+                toast.classList.add('opacity-0', 'translate-y-2', 'pointer-events-none');
+            }, 3000);
+        }
+
+        // --- INITIALIZATION ---
+        window.onload = function() {
+            // Load saved username
+            const savedName = localStorage.getItem('safeSpaceName');
+            if (savedName) {
+                document.getElementById('userNameInput').value = savedName;
+            }
+            
+            // Load saved diary
+            const savedDiary = localStorage.getItem('safeSpaceDiary');
+            if (savedDiary) {
+                document.getElementById('moodDiary').value = savedDiary;
+            }
+
+            personalizeApp();
+            updateTimerDisplay();
+        };
+    </script>
+</body>
+</html>
